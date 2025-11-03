@@ -5,9 +5,14 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "next start"
+    "start": "next start",
+    "migrate": "pnpm dlx prisma generate && env $(cat .env.local | xargs) pnpm dlx prisma migrate dev"
+  },
+  "prisma": {
+    "schema": "db/schema.prisma"
   },
   "dependencies": {
+    "@prisma/client": "^6.18.0",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
