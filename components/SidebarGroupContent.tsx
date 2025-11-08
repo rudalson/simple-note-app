@@ -9,9 +9,9 @@ import {
 import { SearchIcon } from "lucide-react";
 import { Input } from "./ui/input";
 import { useEffect, useMemo, useState } from "react";
-// import Fuse from "fuse.js";
-// import SelectNoteButton from "./SelectNoteButton";
-// import DeleteNoteButton from "./DeleteNoteButton";
+import Fuse from "fuse.js";
+import SelectNoteButton from "./SelectNoteButton";
+import DeleteNoteButton from "./DeleteNoteButton";
 
 type Props = {
   notes: Note[];
@@ -25,16 +25,16 @@ function SidebarGroupContent({ notes }: Props) {
     setLocalNotes(notes);
   }, [notes]);
 
-//   const fuse = useMemo(() => {
-//     return new Fuse(localNotes, {
-//       keys: ["text"],
-//       threshold: 0.4,
-//     });
-//   }, [localNotes]);
+  const fuse = useMemo(() => {
+    return new Fuse(localNotes, {
+      keys: ["text"],
+      threshold: 0.4,
+    });
+  }, [localNotes]);
 
-//   const filteredNotes = searchText
-//     ? fuse.search(searchText).map((result) => result.item)
-//     : localNotes;
+  const filteredNotes = searchText
+    ? fuse.search(searchText).map((result) => result.item)
+    : localNotes;
 
   const deleteNoteLocally = (noteId: string) => {
     setLocalNotes((prevNotes) =>
@@ -55,7 +55,7 @@ function SidebarGroupContent({ notes }: Props) {
       </div>
 
       <SidebarMenu className="mt-4">
-        {/* {filteredNotes.map((note) => (
+        {filteredNotes.map((note) => (
           <SidebarMenuItem key={note.id} className="group/item">
             <SelectNoteButton note={note} />
 
@@ -64,7 +64,7 @@ function SidebarGroupContent({ notes }: Props) {
               deleteNoteLocally={deleteNoteLocally}
             />
           </SidebarMenuItem>
-        ))} */}
+        ))}
       </SidebarMenu>
     </SidebarGroupContentShadCN>
   );
