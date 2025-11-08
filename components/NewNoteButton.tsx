@@ -28,9 +28,8 @@ function NewNoteButton({ user }: Props) {
       await createNoteAction(uuid);
       router.push(`/?noteId=${uuid}&toastType=newNote`);
 
-      toast("Success" ,{
+      toast.success("Success" ,{
           description: "successfully created note",
-        //   variant: "destructive",
         });
 
 
