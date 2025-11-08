@@ -6,7 +6,6 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
-import { toast } from "sonner"
 import { createNoteAction } from "@/actions/notes";
 
 type Props = {
@@ -27,11 +26,6 @@ function NewNoteButton({ user }: Props) {
       const uuid = uuidv4();
       await createNoteAction(uuid);
       router.push(`/?noteId=${uuid}&toastType=newNote`);
-
-      toast.success("Success" ,{
-          description: "successfully created note",
-        });
-
 
       setLoading(false);
     }
