@@ -3,6 +3,7 @@
 import { createClient } from "@/auth/server";
 import { prisma } from "@/db/prisma";
 import { handleError } from "@/lib/utils";
+import { redirect } from "next/navigation";
 
 export const loginAction = async (email: string, password: string) => {
   try {
@@ -52,6 +53,33 @@ export const signUpAction = async (email: string, password: string) => {
         email,
       },
     });
+
+    return { errorMessage: null };
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+export const signInWithGoogleAction = async () => {
+  try {
+    const client = await createClient();
+    const redirectUrl = new URL(
+      "/auth/callback",
+      process.env.NEXT_PUBLIC_BASE_URL,
+    );
+    redirectUrl.searchParams.set("next", "/");
+    const { data, error } = await client.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: redirectUrl.toString(),
+      },
+    });
+
+    if (error) throw error;
+
+    if (data?.url) {
+      redirect(data.url);
+    }
 
     return { errorMessage: null };
   } catch (error) {
