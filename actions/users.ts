@@ -3,7 +3,6 @@
 import { createClient } from "@/auth/server";
 import { prisma } from "@/db/prisma";
 import { handleError } from "@/lib/utils";
-import { redirect } from "next/navigation";
 
 export const loginAction = async (email: string, password: string) => {
   try {
@@ -60,7 +59,12 @@ export const signUpAction = async (email: string, password: string) => {
   }
 };
 
-export const signInWithGoogleAction = async () => {
+type SignInWithGoogleResult = {
+  errorMessage: string | null;
+  url?: string;
+};
+
+export const signInWithGoogleAction = async (): Promise<SignInWithGoogleResult> => {
   try {
     const client = await createClient();
     const redirectUrl = new URL(
@@ -77,11 +81,11 @@ export const signInWithGoogleAction = async () => {
 
     if (error) throw error;
 
-    if (data?.url) {
-      redirect(data.url);
+    if (!data?.url) {
+      throw new Error("Failed to start Google sign-in");
     }
 
-    return { errorMessage: null };
+    return { errorMessage: null, url: data.url };
   } catch (error) {
     return handleError(error);
   }

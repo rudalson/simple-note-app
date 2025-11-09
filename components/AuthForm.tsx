@@ -69,8 +69,19 @@ function AuthForm({ type }: Props) {
           return;
         }
 
+        if (result?.url) {
+          window.location.href = result.url;
+          return;
+        }
+
+        toast("Error", {
+          description: "Unable to start Google sign-in.",
+        });
         setPendingAction(null);
       } catch {
+        toast("Error", {
+          description: "Unable to start Google sign-in.",
+        });
         setPendingAction(null);
       }
     });
