@@ -3,6 +3,7 @@
 import { createClient } from "@/auth/server";
 import { prisma } from "@/db/prisma";
 import { handleError } from "@/lib/utils";
+import { headers } from "next/headers";
 
 export const loginAction = async (email: string, password: string) => {
   try {
@@ -67,10 +68,19 @@ type SignInWithGoogleResult = {
 export const signInWithGoogleAction = async (): Promise<SignInWithGoogleResult> => {
   try {
     const client = await createClient();
-    const redirectUrl = new URL(
-      "/auth/callback",
-      process.env.NEXT_PUBLIC_BASE_URL,
-    );
+    const requestHeaders = await headers();
+    const baseUrl =
+      requestHeaders.get("origin") ||
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      process.env.NEXT_PUBLIC_SITE_URL;
+
+    if (!baseUrl) {
+      throw new Error(
+        "Missing NEXT_PUBLIC_BASE_URL (or site URL) environment variable.",
+      );
+    }
+
+    const redirectUrl = new URL("/auth/callback", baseUrl);
     redirectUrl.searchParams.set("next", "/");
     const { data, error } = await client.auth.signInWithOAuth({
       provider: "google",
