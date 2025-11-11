@@ -69,7 +69,6 @@ export const signInWithGoogleAction = async (): Promise<SignInWithGoogleResult> 
   try {
     const client = await createClient();
     const requestHeaders = await headers();
-
     const forwardedHost =
       requestHeaders.get("x-forwarded-host") || requestHeaders.get("host");
     const forwardedProto = requestHeaders.get("x-forwarded-proto");
