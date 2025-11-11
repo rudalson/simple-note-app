@@ -3,6 +3,7 @@
 import { createClient } from "@/auth/server";
 import { prisma } from "@/db/prisma";
 import { handleError } from "@/lib/utils";
+import { headers } from "next/headers";
 
 export const loginAction = async (email: string, password: string) => {
   try {
@@ -54,6 +55,63 @@ export const signUpAction = async (email: string, password: string) => {
     });
 
     return { errorMessage: null };
+  } catch (error) {
+    return handleError(error);
+  }
+};
+
+type SignInWithGoogleResult = {
+  errorMessage: string | null;
+  url?: string;
+};
+
+export const signInWithGoogleAction = async (): Promise<SignInWithGoogleResult> => {
+  try {
+    const client = await createClient();
+    const requestHeaders = await headers();
+
+    const forwardedHost =
+      requestHeaders.get("x-forwarded-host") || requestHeaders.get("host");
+    const forwardedProto = requestHeaders.get("x-forwarded-proto");
+
+    let baseUrl: string | null = null;
+
+    if (forwardedHost) {
+      const protocol =
+        forwardedProto || (forwardedHost.includes("localhost") ? "http" : "https");
+      baseUrl = `${protocol}://${forwardedHost}`;
+    }
+
+    if (!baseUrl) {
+      const envBase =
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        process.env.NEXT_PUBLIC_BASE_URL ||
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+      baseUrl = envBase;
+    }
+
+    if (!baseUrl) {
+      throw new Error(
+        "Missing NEXT_PUBLIC_BASE_URL (or site URL) environment variable.",
+      );
+    }
+
+    const redirectUrl = new URL("/auth/callback", baseUrl);
+    redirectUrl.searchParams.set("next", "/");
+    const { data, error } = await client.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: redirectUrl.toString(),
+      },
+    });
+
+    if (error) throw error;
+
+    if (!data?.url) {
+      throw new Error("Failed to start Google sign-in");
+    }
+
+    return { errorMessage: null, url: data.url };
   } catch (error) {
     return handleError(error);
   }

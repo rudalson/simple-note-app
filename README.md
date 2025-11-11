@@ -50,8 +50,15 @@ Run `pnpm dlx prisma studio` during development if you’d like to browse the da
 | `DATABASE_URL` | Connection string for the Postgres database used by Prisma. |
 | `SUPABASE_URL` | Supabase project URL used to create server-side clients. |
 | `SUPABASE_ANON_KEY` | Supabase anonymous API key for browser + server actions. |
-| `NEXT_PUBLIC_BASE_URL` | Absolute base URL (e.g., `http://localhost:3000`) used by middleware when calling internal APIs and issuing redirects. |
+| `NEXT_PUBLIC_BASE_URL` | Absolute base URL (e.g., `http://localhost:3000`) used by middleware when calling internal APIs and issuing redirects. On Vercel, you can omit this as the app falls back to the deployment host from `VERCEL_URL`. |
 | `OPENAI_API_KEY` | API key for the OpenAI client that powers the Ask AI dialog. |
+
+### Configure Google OAuth in Supabase
+To get Google sign-in working locally and in production, make sure the Supabase project is configured with the following settings:
+
+1. In the **Authentication → Providers** section of the Supabase dashboard, enable the Google provider and supply the OAuth client credentials from the Google Cloud Console.
+2. On the **Authentication → URL Configuration** screen, set the **Site URL** to the same value as `NEXT_PUBLIC_BASE_URL` (e.g., `http://localhost:3000` during local development).
+3. Add `http://localhost:3000/auth/callback` (and any other deployment callback URLs) to the **Additional Redirect URLs** list so Supabase can redirect the browser back to the app after Google completes the consent flow.
 
 ### Useful scripts
 | Command | Description |
