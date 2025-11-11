@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
     data: {
       authorId: userId,
       text: "",
+      title: "",
     },
   });
 

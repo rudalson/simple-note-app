@@ -8,23 +8,24 @@ generator client {
 }
 
 model Note {
-  id        String     @id @default(uuid())
-  title     String
-  text      String
-  author    User       @relation(fields: [authorId], references: [id])
-  authorId  String
-  directory Directory  @relation(fields: [directoryId], references: [id])
+  id          String    @id @default(uuid())
+  title       String
+  text        String
+  author      User      @relation(fields: [authorId], references: [id])
+  authorId    String
+  directory   Directory @relation(fields: [directoryId], references: [id])
   directoryId String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
 }
 
 model User {
-  id    String         @id @default(uuid())
-  email String         @unique
-  notes Note[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt @default(now())
+  id          String      @id @default(uuid())
+  email       String      @unique
+  notes       Note[]
+  directories Directory[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now()) @updatedAt
 }
 
 model Directory {
@@ -34,5 +35,5 @@ model Directory {
   userId    String
   notes     Note[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
