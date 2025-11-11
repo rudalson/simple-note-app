@@ -50,7 +50,7 @@ Run `pnpm dlx prisma studio` during development if you’d like to browse the da
 | `DATABASE_URL` | Connection string for the Postgres database used by Prisma. |
 | `SUPABASE_URL` | Supabase project URL used to create server-side clients. |
 | `SUPABASE_ANON_KEY` | Supabase anonymous API key for browser + server actions. |
-| `NEXT_PUBLIC_BASE_URL` | Absolute base URL (e.g., `http://localhost:3000`) used by middleware when calling internal APIs and issuing redirects. |
+| `NEXT_PUBLIC_BASE_URL` | Absolute base URL (e.g., `http://localhost:3000`) used by middleware when calling internal APIs and issuing redirects. On Vercel, you can omit this as the app falls back to the deployment host from `VERCEL_URL`. |
 | `OPENAI_API_KEY` | API key for the OpenAI client that powers the Ask AI dialog. |
 
 ### Configure Google OAuth in Supabase

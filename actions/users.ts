@@ -69,10 +69,25 @@ export const signInWithGoogleAction = async (): Promise<SignInWithGoogleResult> 
   try {
     const client = await createClient();
     const requestHeaders = await headers();
-    const baseUrl =
-      requestHeaders.get("origin") ||
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      process.env.NEXT_PUBLIC_SITE_URL;
+    const forwardedHost =
+      requestHeaders.get("x-forwarded-host") || requestHeaders.get("host");
+    const forwardedProto = requestHeaders.get("x-forwarded-proto");
+
+    let baseUrl: string | null = null;
+
+    if (forwardedHost) {
+      const protocol =
+        forwardedProto || (forwardedHost.includes("localhost") ? "http" : "https");
+      baseUrl = `${protocol}://${forwardedHost}`;
+    }
+
+    if (!baseUrl) {
+      const envBase =
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        process.env.NEXT_PUBLIC_BASE_URL ||
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+      baseUrl = envBase;
+    }
 
     if (!baseUrl) {
       throw new Error(
