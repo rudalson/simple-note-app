@@ -6,6 +6,31 @@ import { handleError } from "@/lib/utils";
 import openai from "@/openai";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
+const extractTitleFromText = (text: string) => {
+  const trimmedText = text.trim();
+  if (!trimmedText) return "";
+
+  const newlineIndex = trimmedText.indexOf("\n");
+  const periodIndex = trimmedText.indexOf(".");
+  const exclamationIndex = trimmedText.indexOf("!");
+  const questionIndex = trimmedText.indexOf("?");
+
+  const sentenceEndCandidates = [
+    newlineIndex === -1 ? undefined : newlineIndex,
+    periodIndex === -1 ? undefined : periodIndex + 1,
+    exclamationIndex === -1 ? undefined : exclamationIndex + 1,
+    questionIndex === -1 ? undefined : questionIndex + 1,
+  ].filter((value): value is number => typeof value === "number");
+
+  if (sentenceEndCandidates.length === 0) {
+    return trimmedText;
+  }
+
+  const sentenceEndIndex = Math.min(...sentenceEndCandidates);
+
+  return trimmedText.slice(0, sentenceEndIndex).trim();
+};
+
 export const createNoteAction = async (noteId: string) => {
   try {
     const user = await getUser();
@@ -16,6 +41,7 @@ export const createNoteAction = async (noteId: string) => {
         id: noteId,
         authorId: user.id,
         text: "",
+        title: "",
       },
     });
 
@@ -30,9 +56,11 @@ export const updateNoteAction = async (noteId: string, text: string) => {
     const user = await getUser();
     if (!user) throw new Error("You must be logged in to update a note");
 
+    const title = extractTitleFromText(text);
+
     await prisma.note.update({
       where: { id: noteId },
-      data: { text },
+      data: { text, title },
     });
 
     return { errorMessage: null };
